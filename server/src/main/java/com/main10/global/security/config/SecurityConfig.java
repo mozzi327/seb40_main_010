@@ -77,7 +77,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests()
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                 /* --------------------------------------------     기타      -----------------------------------------*/
-                .antMatchers(HttpMethod.GET, "/h2/**").hasRole("ADMIN")
+                .antMatchers(HttpMethod.GET, "/h2/**").hasAuthority("ROLE_ADMIN")
+                .antMatchers(HttpMethod.GET, "/docs/**").hasAuthority("ROLE_ADMIN")
                 /* --------------------------------------------  AUTH 도메인  -----------------------------------------*/
                 .antMatchers(HttpMethod.POST, "/auth/login").permitAll()
                 .antMatchers(HttpMethod.DELETE, "/auth/logout").hasAuthority("ROLE_USER")
@@ -90,6 +91,7 @@ public class SecurityConfig {
                 .antMatchers(HttpMethod.PATCH, "/member/profileLocal").hasAuthority("ROLE_USER")
                 /* -------------------------------------------- BOOKMARK 도메인 -----------------------------------------*/
                 .antMatchers(HttpMethod.GET, "/bookmark/*").hasAuthority("ROLE_USER")
+                .antMatchers(HttpMethod.GET, "/bookmark").hasAuthority("ROLE_USER")
                 /* --------------------------------------------  PLACE 도메인  -----------------------------------------*/
                 // - place
                 .antMatchers(HttpMethod.GET, "/place/*").permitAll()
