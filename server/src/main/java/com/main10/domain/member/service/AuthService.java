@@ -46,7 +46,6 @@ public class AuthService {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(AUTHORIZATION, generateAccessToken);
-        headers.add(REFRESH_TOKEN, generateRefreshToken);
 
         redisUtils.setData(findMember.getEmail(), provider, generateRefreshToken, jwtTokenUtils.getRefreshTokenExpirationMinutes());
 

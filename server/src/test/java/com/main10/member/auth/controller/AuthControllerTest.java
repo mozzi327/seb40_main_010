@@ -8,7 +8,6 @@ import com.main10.domain.member.entity.Member;
 import com.main10.domain.member.service.AuthService;
 import com.main10.domain.member.service.MemberDbService;
 import com.main10.global.security.dto.LoginDto;
-import com.main10.global.security.provider.JwtAuthenticationProvider;
 import com.main10.global.security.token.JwtAuthenticationToken;
 import com.main10.global.security.utils.JwtTokenUtils;
 import com.main10.global.security.utils.RedisUtils;

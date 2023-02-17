@@ -25,11 +25,13 @@ public class BatchController {
     @GetMapping("/mbti")
     public ResponseEntity<SingleResponseDto<?>> getMbti(Authentication authentication) {
         JwtAuthenticationToken token = (JwtAuthenticationToken) authentication;
-        Long memberId;
-        if (token == null) memberId = null;
-        else memberId = token.getId();
+        Long memberId = getMemberIdIfExistToken(token);
         List<PlaceDto.Response> result = batchService.getBestMbtiPlaceForMember(memberId);
         return ResponseEntity.ok().body(new SingleResponseDto<>(result));
     }
 
+    private Long getMemberIdIfExistToken(JwtAuthenticationToken token) {
+        if (token == null) return null;
+        else return token.getId();
+    }
 }

@@ -38,6 +38,16 @@ public class CustomAuthorityUtils {
     }
 
     /**
+     * 사용자 이메일을 통해 GrantedAuthority 컬렉션을 리턴해주는 메서드
+     * @param email 사용자 이메일
+     * @return List(GrantedAuthority)
+     * @author mozzi327
+     */
+    public List<GrantedAuthority> createAuthorities(String email) {
+        return USER_ROLES;
+    }
+
+    /**
      * 사용자 권한 리스트를 통해 GradtedAuthority 컬렉션을 리턴해주는 메서드
      * @param roles 사용자 권한 리스트
      * @return List(GrantedAuthority)

@@ -1,5 +1,6 @@
 package com.main10.global.security.token;
 
+import lombok.Builder;
 import lombok.Getter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -14,17 +15,26 @@ import java.util.Collection;
 public class JwtAuthenticationToken extends AbstractAuthenticationToken {
     private String accessToken;
     private Object principal;
-    private Object credentials;
+    private Object credential;
     private Long id;
+    private boolean isExpired;
+    private String name;
 
+    @Builder
     public JwtAuthenticationToken(Collection<? extends GrantedAuthority> authorities,
                                   Object principal,
+                                  Object credential,
                                   Long id,
-                                  Object credentials) {
+                                  boolean isExpired,
+                                  String accessToken,
+                                  String name) {
         super(authorities);
         this.principal = principal;
-        this.credentials = credentials;
+        this.credential = credential;
         this.id = id;
+        this.isExpired = isExpired;
+        this.accessToken = accessToken;
+        this.name = name;
         this.setAuthenticated(true);
     }
 
@@ -41,7 +51,7 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
      */
     @Override
     public Object getCredentials() {
-        return this.credentials;
+        return this.credential;
     }
 
     /**
@@ -62,4 +72,6 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
     public String getAccessToken() {
         return accessToken;
     }
+
+
 }

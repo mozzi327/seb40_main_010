@@ -9,10 +9,13 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Redis Util 클래스
+ *
  * @author mozzi327
  */
 @Component
@@ -24,11 +27,12 @@ public class RedisUtils {
 
     /**
      * redis에서 key-value를 저장하는 메서드
+     *
      * @param key REFRESH_TOKEN
-     * @param o String(key)
+     * @param o   String(key)
      * @author mozzi327
      */
-    public void setData(String key, String provider ,String  o, int minutes) {
+    public void setData(String key, String provider, String o, int minutes) {
         redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(o.getClass()));
         String refreshKey = provider + "RT :" + key;
         redisTemplate.opsForValue().set(refreshKey, o, minutes * 60L, TimeUnit.SECONDS);
@@ -36,6 +40,7 @@ public class RedisUtils {
 
     /**
      * redis에서 key에 대한 value 값을 가져오는 메서드
+     *
      * @param key REFRESH_TOKEN
      * @return String(key)
      * @author mozzi327
@@ -47,6 +52,7 @@ public class RedisUtils {
 
     /**
      * redis에서 key에 대한 row를 삭제하는 메서드
+     *
      * @param key REFRESH_TOKEN
      * @author mozzi327
      */
@@ -57,7 +63,8 @@ public class RedisUtils {
 
     /**
      * redis 로그아웃 처리를 위한 블랙 리스트 메서드
-     * @param key REFRESH_TOKEN
+     *
+     * @param key     REFRESH_TOKEN
      * @param setTime 만료시간(분)
      * @author mozzi327
      */
@@ -69,6 +76,7 @@ public class RedisUtils {
 
     /**
      * accessToken 블랙리스트 여부 조회 메서드(로그아웃)
+     *
      * @param key accessToken
      * @return accssToken
      * @author mozzi327
@@ -80,6 +88,7 @@ public class RedisUtils {
 
     /**
      * 리프레시 토큰을 통해 memberId를 조회하는 메서드(논의 필요)
+     *
      * @param refreshToken 리프레시 토큰
      * @return Long(memberId)
      * @author mozzi327
@@ -90,5 +99,19 @@ public class RedisUtils {
         ValueOperations<String, String> stringValueOperations = redisBlackListTemplate.opsForValue();
         String id = String.valueOf(stringValueOperations.get(refreshToken));
         return Long.valueOf(id);
+    }
+
+    /**
+     * redis refreshToken 존재 유무 메서드
+     *
+     * @param key 사용자 email
+     * @return
+     * @author mozzi327
+     */
+    public void isExistRefreshToken(String key) {
+        String refreshKey = "commonRT : " + key;
+        Optional<Object> isExistToken = Optional.ofNullable(redisTemplate.opsForValue().get(refreshKey));
+
+        isExistToken.orElseThrow(() -> new AuthException(ExceptionCode.INVALID_REFRESH_TOKEN));
     }
 }

@@ -3,12 +3,12 @@ package com.main10.global.security.config;
 import com.main10.domain.member.repository.MemberRepository;
 import com.main10.global.security.handler.MemberAccessDeniedHandler;
 import com.main10.global.security.handler.MemberAuthenticationEntryPoint;
+import com.main10.global.security.utils.CustomAuthorityUtils;
 import com.main10.global.security.utils.RedisUtils;
 import com.main10.global.security.details.OAuth2DetailService;
 import com.main10.global.security.filter.JwtVerificationFilter;
 import com.main10.global.security.handler.OAuth2FailureHandler;
 import com.main10.global.security.handler.OAuth2SuccessHandler;
-import com.main10.global.security.provider.JwtAuthenticationProvider;
 import com.main10.global.security.utils.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -17,8 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -32,7 +30,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CharacterEncodingFilter;
-import java.util.List;
 
 import static com.main10.global.security.utils.AuthConstants.AUTHORIZATION;
 import static com.main10.global.security.utils.AuthConstants.REFRESH_TOKEN;
@@ -43,7 +40,7 @@ import static com.main10.global.security.utils.AuthConstants.REFRESH_TOKEN;
  */
 @Slf4j
 @Configuration
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
     @Value("${address.local-front}")
@@ -61,11 +58,11 @@ public class SecurityConfig {
     @Value("${address.local}")
     private String LOCAL;
 
-    private final JwtTokenUtils jwtTokenUtils;
     private final RedisUtils redisUtils;
-    private final JwtAuthenticationProvider jwtAuthenticationProvider;
-    private final OAuth2DetailService oAuth2DetailService;
+    private final JwtTokenUtils jwtTokenUtils;
     private final MemberRepository memberRepository;
+    private final CustomAuthorityUtils authorityUtils;
+    private final OAuth2DetailService oAuth2DetailService;
 
     /**
      * Spring Context에 필터 체인을 등록하는 메서드
@@ -187,14 +184,11 @@ public class SecurityConfig {
     private class CustomFilterConfig extends AbstractHttpConfigurer<CustomFilterConfig, HttpSecurity> {
         @Override
         public void configure(HttpSecurity builder) {
-            AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
-
             JwtVerificationFilter jwtVerificationFilter
-                    = new JwtVerificationFilter(authenticationManager, jwtTokenUtils, redisUtils);
+                    = new JwtVerificationFilter(redisUtils, jwtTokenUtils, authorityUtils);
             builder
                     .addFilterBefore(jwtVerificationFilter, OAuth2LoginAuthenticationFilter.class)
-                    .addFilterBefore(jwtVerificationFilter, UsernamePasswordAuthenticationFilter.class)
-                    .authenticationProvider(jwtAuthenticationProvider);
+                    .addFilterBefore(jwtVerificationFilter, UsernamePasswordAuthenticationFilter.class);
         }
     }
 }
